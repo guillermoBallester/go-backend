@@ -1,0 +1,29 @@
+name: TechDocs
+on:
+  push: {}
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      run-techdocs-ci: ${{ steps.changes.outputs.techdocs == 'true' && github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          list-files: json
+          filters: |
+            techdocs:
+              - 'docs/**'
+  techdocs:
+    if: ${{ needs.setup.outputs.run-techdocs-ci == 'true'}}
+    concurrency:
+      group: ${{ github.repository }}-${{ github.workflow }}-techdocs-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+    name: TechDocs
+    uses: coopnorge/github-workflow-techdocs/.github/workflows/techdocs.yaml@v0

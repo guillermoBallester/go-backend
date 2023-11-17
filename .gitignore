@@ -1,0 +1,13 @@
+*.iml
+*.env
+.idea
+node_modules/
+.DS_STORE
+vendor
+mkdocs.yml
+
+src/client/cmd/logistics/logistics
+src/client/cmd/logistics/coop_logistics
+
+# Assigment implementation
+solution

@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  # Update docker compose to run your server
+  # Don't forget own Dockerfile
+  # Port must be exposed as well, Go compiled and Executed
+  interview_backend_coop_logistics_client:
+    build:
+      context: .
+      dockerfile: docker-compose/Dockerfile-Project
+    container_name: interview_backend_coop_logistics_client
+    environment:
+      - CLIENT_SERVICE_PORT=50051
+      - CLIENT_SERVICE_HOST=interview_backend_coop_logistics_server
+    networks:
+      - coop-norge-interview-network
+  # Coop internal documentation
+  techdocs:
+    build:
+      context: docker-compose
+      dockerfile: Dockerfile
+      target: techdocs
+    working_dir: /srv/workspace
+    volumes:
+      - .:/srv/workspace:z
+      - ${XDG_CACHE_HOME:-xdg-cache-home}:/root/.cache
+    ports:
+      - "127.0.0.1:3000:3000/tcp"
+      - "127.0.0.1:8000:8000/tcp"
+    command: serve
+volumes:
+  xdg-cache-home: { }
+  nothing: { }
+networks:
+  coop-norge-interview-network:

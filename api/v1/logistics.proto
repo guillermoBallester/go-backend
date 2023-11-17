@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package coopnorge.logistics.api.v1;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// ---------------------------------------
+// Service
+// ---------------------------------------
+
+// CoopLogisticsEngineAPI
+service CoopLogisticsEngineAPI {
+    // MoveUnit request will be send when unit moves in dimensions to new location.
+    rpc MoveUnit(MoveUnitRequest) returns (DefaultResponse) {
+        option (google.api.http) = {
+            post: "/v1/cargo_unit/move"
+            body: "*"
+        };
+    }
+    // UnitReachedWarehouse reports when unit reached warehouse to do something there.
+    rpc UnitReachedWarehouse(UnitReachedWarehouseRequest) returns (DefaultResponse) {
+        option (google.api.http) = {
+            post: "/v1/warehouse/cargo_unit/reached"
+            body: "*"
+        };
+    }
+}
+
+// ---------------------------------------
+// Requests
+// ---------------------------------------
+
+// MoveUnitRequest
+message MoveUnitRequest {
+    int64 cargo_unit_id = 1;
+    Location location = 2;
+}
+
+// UnitReachedWarehouseRequest contains WarehouseAnnouncement with Location
+message UnitReachedWarehouseRequest {
+    Location location = 1;
+    WarehouseAnnouncement announcement = 2;
+}
+
+// ---------------------------------------
+// Responses
+// ---------------------------------------
+
+// DefaultResponse
+message DefaultResponse {}
+
+// ---------------------------------------
+// Models
+// ---------------------------------------
+
+// WarehouseAnnouncement
+message WarehouseAnnouncement {
+    // cargo_unit_id is unique id
+    int64 cargo_unit_id = 1;
+    // warehouse_id is unique id
+    int64 warehouse_id = 2;
+    // the message contains information about the announcement
+    string message = 3;
+}
+
+// Location where entity now located in X,Y Axis
+message Location {
+    uint32 Latitude = 1;
+    uint32 Longitude = 2;
+}

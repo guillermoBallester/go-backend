@@ -1,0 +1,46 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+env:
+  XDG_CACHE_HOME: ${{ github.workspace }}/.cache/xdg
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - id: go-cache-paths
+        run: |
+          echo "::save-state name=go-build::$(go env GOCACHE)"
+          echo "::save-state name=go-mod::$(go env GOMODCACHE)"
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+      - name: Go Build
+        run: |
+          cd src/client
+          go build -a -v -o "cmd/logistics/client" "./cmd/logistics"
+      - name: Lint Code Base
+        uses: github/super-linter@v5
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_GO: true
+          DEFAULT_BRANCH: main
+          FILTER_REGEX_EXCLUDE: .*vendor/.*
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Unit Test with Race
+        run: |
+          cd src/client
+          go test -v --race $(go list ./... | (grep -v /vendor/))
