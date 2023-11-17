@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	serverApi "github.com/coopnorge/interview-backend/src/server/generated/proto"
+	serverApi "github.com/gsasso/go-backend/src/server/internal/generated/proto"
 )
 
 type GRPCLogisticServer struct {
