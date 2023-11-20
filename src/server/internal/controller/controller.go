@@ -17,7 +17,7 @@ func NewLogisticController() *LogisticCtlr {
 
 func (ctlr *LogisticCtlr) MoveUnit(ctx context.Context, req *serverApi.MoveUnitRequest) (*serverApi.DefaultResponse, error) {
 	cargoId := req.GetCargoUnitId()
-	fmt.Printf("Cargo Unit moved: %s", cargoId)
+	fmt.Println("Cargo Unit moved: %s", cargoId)
 	resp := &serverApi.DefaultResponse{}
 	return resp, nil
 
@@ -25,7 +25,7 @@ func (ctlr *LogisticCtlr) MoveUnit(ctx context.Context, req *serverApi.MoveUnitR
 
 func (s *LogisticCtlr) UnitReachedWarehouse(ctx context.Context, req *serverApi.UnitReachedWarehouseRequest) (*serverApi.DefaultResponse, error) {
 	announcement := req.GetAnnouncement()
-	fmt.Printf("Announcement: %s", announcement)
+	fmt.Println("Announcement: %s", announcement)
 	resp := &serverApi.DefaultResponse{}
 	return resp, nil
 }
