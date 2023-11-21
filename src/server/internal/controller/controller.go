@@ -50,9 +50,10 @@ func ReceiveUnits(units chan int64, cargoId int64) chan int64 {
 	return units
 }
 
-func MakeSummaryUnits(units <-chan int64, summary chan<- string) {
+func MakeSummaryUnits(units chan int64, summary chan<- string) {
 	var counter int
 	time.Sleep(1 * time.Second)
+	//close(units)
 	for i := range units {
 		fmt.Println("Unit ", i, " received")
 		counter = counter + 1
