@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"sync"
 	"time"
 
 	serverApi "github.com/gsasso/go-backend/src/server/internal/generated/proto"
@@ -20,20 +19,22 @@ func NewLogisticController() *LogisticCtlr {
 
 func (ctlr *LogisticCtlr) MoveUnit(ctx context.Context, req *serverApi.MoveUnitRequest) (*serverApi.DefaultResponse, error) {
 
-	var wg sync.WaitGroup
-	var ReceiveUnitsCh = make(chan int64)
-	var MakeSummaryUnitsCh = make(chan string)
+	// var wg sync.WaitGroup
+	// var ReceiveUnitsCh = make(chan int64)
+	// var MakeSummaryUnitsCh = make(chan string)
 
-	go ReceiveUnits(ReceiveUnitsCh, req.GetCargoUnitId())
-	go MakeSummaryUnits(ReceiveUnitsCh, MakeSummaryUnitsCh)
+	// go ReceiveUnits(ReceiveUnitsCh, req.GetCargoUnitId())
+	// go MakeSummaryUnits(ReceiveUnitsCh, MakeSummaryUnitsCh)
 
-	wg.Add(1)
-	go func(MakeSummaryUnitsCh <-chan string) {
-		summary := <-MakeSummaryUnitsCh
-		fmt.Println(summary)
-		wg.Done()
-	}(MakeSummaryUnitsCh)
-	wg.Wait()
+	// wg.Add(1)
+	// go func(MakeSummaryUnitsCh <-chan string) {
+	// 	summary := <-MakeSummaryUnitsCh
+	// 	fmt.Println(summary)
+	// 	wg.Done()
+	// }(MakeSummaryUnitsCh)
+	// wg.Wait()
+
+	//ticker.ReceiveUnitsCh <- req.GetCargoUnitId()
 
 	resp := &serverApi.DefaultResponse{}
 	return resp, nil
