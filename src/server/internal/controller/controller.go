@@ -3,6 +3,9 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"sync"
+	"time"
 
 	serverApi "github.com/gsasso/go-backend/src/server/internal/generated/proto"
 )
@@ -16,16 +19,45 @@ func NewLogisticController() *LogisticCtlr {
 }
 
 func (ctlr *LogisticCtlr) MoveUnit(ctx context.Context, req *serverApi.MoveUnitRequest) (*serverApi.DefaultResponse, error) {
-	cargoId := req.GetCargoUnitId()
-	fmt.Println("Cargo Unit moved: %s", cargoId)
+
+	var wg sync.WaitGroup
+	var ReceiveUnitsCh = make(chan int64)
+	var MakeSummaryUnitsCh = make(chan string)
+
+	go ReceiveUnits(ReceiveUnitsCh, req.GetCargoUnitId())
+	go MakeSummaryUnits(ReceiveUnitsCh, MakeSummaryUnitsCh)
+
+	wg.Add(1)
+	go func(MakeSummaryUnitsCh <-chan string) {
+		summary := <-MakeSummaryUnitsCh
+		fmt.Println(summary)
+		wg.Done()
+	}(MakeSummaryUnitsCh)
+	wg.Wait()
+
 	resp := &serverApi.DefaultResponse{}
 	return resp, nil
 
 }
 
 func (s *LogisticCtlr) UnitReachedWarehouse(ctx context.Context, req *serverApi.UnitReachedWarehouseRequest) (*serverApi.DefaultResponse, error) {
-	announcement := req.GetAnnouncement()
-	fmt.Println("Announcement: %s", announcement)
 	resp := &serverApi.DefaultResponse{}
 	return resp, nil
+}
+
+func ReceiveUnits(units chan int64, cargoId int64) chan int64 {
+	units <- cargoId
+	return units
+}
+
+func MakeSummaryUnits(units <-chan int64, summary chan<- string) {
+	var counter int
+	time.Sleep(1 * time.Second)
+	for i := range units {
+		fmt.Println("Unit ", i, " received")
+		counter = counter + 1
+	}
+	str := strconv.Itoa(counter)
+	message := "Total orders received" + str
+	summary <- message
 }

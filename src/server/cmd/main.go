@@ -6,5 +6,4 @@ func main() {
 	if app != nil {
 		app.Start()
 	}
-
 }
