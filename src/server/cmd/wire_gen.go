@@ -9,12 +9,14 @@ package main
 import (
 	"github.com/gsasso/go-backend/src/server/internal/controller"
 	"github.com/gsasso/go-backend/src/server/internal/server"
+	"github.com/gsasso/go-backend/src/server/internal/ticker"
 )
 
 // Injectors from wire.go:
 
-func InitializeApp() *server.LogisticServer {
-	logisticCtlr := controller.NewLogisticController()
+func Initialize() *server.LogisticServer {
+	summary := ticker.Summary{}
+	logisticCtlr := controller.NewLogisticController(summary)
 	logisticServer := server.RunGRPCServer(logisticCtlr)
 	return logisticServer
 }

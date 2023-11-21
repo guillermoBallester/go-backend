@@ -8,13 +8,14 @@ import (
 
 	controller "github.com/gsasso/go-backend/src/server/internal/controller"
 	serverApi "github.com/gsasso/go-backend/src/server/internal/generated/proto"
+	"github.com/gsasso/go-backend/src/server/internal/ticker"
 )
 
 type LogisticServer struct {
 	server *grpc.Server
 }
 
-var ServerProvider = wire.NewSet(controller.NewLogisticController, RunGRPCServer)
+var ServerProvider = wire.NewSet(wire.Struct(new(ticker.Summary)), controller.NewLogisticController, RunGRPCServer)
 
 func RunGRPCServer(ctlr *controller.LogisticCtlr) *LogisticServer {
 
