@@ -10,7 +10,6 @@ type Summary struct {
 	totalUnits       int
 	totalReached     int
 	messagePerSecond int
-	finished         bool
 	mu               sync.Mutex
 }
 
@@ -23,18 +22,19 @@ func (s *Summary) Tick() {
 		for {
 			select {
 			case <-done:
+				fmt.Println("Total units reached: ", s.totalReached)
+				fmt.Println("Total units processed: ", s.totalUnits)
 				return
 			case t := <-ticker.C:
 				fmt.Println("Messages per second at ", t, "are: ", s.messagePerSecond)
-				s.ResetMessagePerSecond()
 			}
+			s.ResetMessagePerSecond()
 		}
+
 	}()
 
 	time.Sleep(10 * time.Second)
 	ticker.Stop()
-	fmt.Println("Total Units received: ", s.totalUnits)
-	fmt.Println("Total Units reached: ", s.totalReached)
 	done <- true
 }
 
