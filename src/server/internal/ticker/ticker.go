@@ -13,6 +13,11 @@ type Summary struct {
 	mu               sync.Mutex
 }
 
+type SummaryResponse struct {
+	totalUnits   int `json:"totalUnits"`
+	totalReached int `json:"totalReached"`
+}
+
 var summaryResult Summary
 
 type SummaryService struct{}
@@ -21,7 +26,7 @@ type SummaryInt interface {
 	IncreaseTotalUnits()
 	ResetMessagePerSecond()
 	IncreaseTotalReached()
-	GetSummary() (*Summary, error)
+	GetSummary() (SummaryResponse, error)
 	Tick()
 }
 
@@ -70,6 +75,11 @@ func (s *SummaryService) ResetMessagePerSecond() {
 	summaryResult.messagePerSecond = 0
 }
 
-func (s *SummaryService) GetSummary() (*Summary, error) {
-	return &summaryResult, nil
+func (s *SummaryService) GetSummary() (SummaryResponse, error) {
+	summaryResult.mu.Lock()
+	defer summaryResult.mu.Unlock()
+	return SummaryResponse{
+		totalUnits:   summaryResult.totalUnits,
+		totalReached: summaryResult.totalReached,
+	}, nil
 }

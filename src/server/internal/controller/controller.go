@@ -26,7 +26,7 @@ func (ctlr *LogisticCtlr) MoveUnit(ctx context.Context, req *serverApi.MoveUnitR
 }
 
 func (ctlr *LogisticCtlr) UnitReachedWarehouse(ctx context.Context, req *serverApi.UnitReachedWarehouseRequest) (*serverApi.DefaultResponse, error) {
-	//ctlr.svc.IncreaseTotalReached()
+	ctlr.svc.IncreaseTotalReached()
 	resp := &serverApi.DefaultResponse{}
 	return resp, nil
 }

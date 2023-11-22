@@ -20,15 +20,16 @@ type JSONServer struct {
 }
 
 func (s *JSONServer) Run() {
-
+	http.HandleFunc("/", ProvideAPIfunc(s.HandleGetSummary))
 	http.ListenAndServe(s.listenAddr, nil)
 }
 
 func (s *JSONServer) HandleGetSummary(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	summary, err := s.svc.GetSummary()
+	summaryResp, err := s.svc.GetSummary()
 	if err != nil {
 		return err
 	}
+
 	w.WriteHeader(http.StatusOK)
-	return json.NewEncoder(w).Encode(summary)
+	return json.NewEncoder(w).Encode(summaryResp)
 }
