@@ -13,8 +13,21 @@ type Summary struct {
 	mu               sync.Mutex
 }
 
-func (s *Summary) Tick() {
+var summaryResult Summary
 
+type SummaryService struct{}
+
+type SummaryInt interface {
+	IncreaseTotalUnits()
+	// ResetMessagePerSecond()
+	// IncreaseTotalReached()
+	// GetSummary()
+	Tick()
+}
+
+func (s *SummaryService) Tick() {
+
+	fmt.Println("tick triggered")
 	ticker := time.NewTicker(1 * time.Second)
 	done := make(chan bool)
 
@@ -22,38 +35,42 @@ func (s *Summary) Tick() {
 		for {
 			select {
 			case <-done:
-				fmt.Println("Total units reached: ", s.totalReached)
-				fmt.Println("Total units processed: ", s.totalUnits)
+				fmt.Println("Total units reached: ", summaryResult.totalReached)
+				fmt.Println("Total units processed: ", summaryResult.totalUnits)
 				return
 			case t := <-ticker.C:
-				fmt.Println("Messages per second at ", t, "are: ", s.messagePerSecond)
+				fmt.Println("Messages per second at ", t, "are: ", summaryResult.messagePerSecond)
 			}
-			s.ResetMessagePerSecond()
 		}
-
 	}()
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(30 * time.Second)
 	ticker.Stop()
 	done <- true
 }
 
-func (s *Summary) IncreaseTotalUnits() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.totalUnits++
-	s.messagePerSecond++
+func (s *SummaryService) IncreaseTotalUnits() {
+	fmt.Println("Increasing", summaryResult.totalUnits)
+	summaryResult.mu.Lock()
+	defer summaryResult.mu.Unlock()
+	summaryResult.totalUnits++
+	summaryResult.messagePerSecond++
+	fmt.Println("Increased", summaryResult.totalUnits)
 }
 
-func (s *Summary) IncreaseTotalReached() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.totalReached++
-	s.messagePerSecond++
-}
+//  func (s *Summary) IncreaseTotalReached() {
+//  	s.mu.Lock()
+//  	defer s.mu.Unlock()
+//  	s.totalReached++
+// / 	s.messagePerSecond++
+// // }
 
-func (s *Summary) ResetMessagePerSecond() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.messagePerSecond = 0
-}
+// func (s *Summary) ResetMessagePerSecond() {
+// 	s.mu.Lock()
+// 	defer s.mu.Unlock()
+// 	s.messagePerSecond = 0
+// }
+
+// func (s *Summary) GetSummary() (*Summary, error) {
+// 	return s, nil
+// }

@@ -8,10 +8,9 @@ import (
 
 func main() {
 
-	summary := ticker.Summary{}
-	logisticCtlr := controller.NewLogisticController(summary)
+	logisticCtlr := controller.NewLogisticController(&ticker.SummaryService{})
+	//logisticCtlr.svc.Tick()
 	logisticServer := server.RunGRPCServer(logisticCtlr)
-	go summary.Tick()
 	logisticServer.Start()
 
 }
