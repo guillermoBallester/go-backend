@@ -13,7 +13,7 @@ type LogisticCtlr struct {
 }
 
 func NewLogisticController(svc ticker.SummaryInt) *LogisticCtlr {
-	svc.Tick()
+	go svc.Tick()
 	return &LogisticCtlr{
 		svc: svc,
 	}

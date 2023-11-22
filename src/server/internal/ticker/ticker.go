@@ -36,30 +36,32 @@ func (s *SummaryService) Tick() {
 	done := make(chan bool)
 
 	go func() {
+	loop:
 		for {
 			select {
 			case <-done:
-				fmt.Println("Total units reached: ", summaryResult.totalReached)
-				fmt.Println("Total units processed: ", summaryResult.totalUnits)
 				return
 			case t := <-ticker.C:
 				fmt.Println("Messages per second at ", t, "are: ", summaryResult.messagePerSecond)
+				if summaryResult.totalUnits != 0 && summaryResult.messagePerSecond == 0 {
+					fmt.Println("Total units reached: ", summaryResult.totalReached)
+					fmt.Println("Total units processed: ", summaryResult.totalUnits)
+					ticker.Stop()
+					done <- true
+					break loop
+				}
+				s.ResetMessagePerSecond()
 			}
 		}
 	}()
 
-	time.Sleep(30 * time.Second)
-	ticker.Stop()
-	done <- true
 }
 
 func (s *SummaryService) IncreaseTotalUnits() {
-	fmt.Println("Increasing", summaryResult.totalUnits)
 	summaryResult.mu.Lock()
 	defer summaryResult.mu.Unlock()
 	summaryResult.totalUnits++
 	summaryResult.messagePerSecond++
-	fmt.Println("Increased", summaryResult.totalUnits)
 }
 
 func (s *SummaryService) IncreaseTotalReached() {
