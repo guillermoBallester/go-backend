@@ -7,10 +7,7 @@ import (
 )
 
 func main() {
-
 	logisticCtlr := controller.NewLogisticController(&ticker.SummaryService{})
-	//logisticCtlr.svc.Tick()
 	logisticServer := server.RunGRPCServer(logisticCtlr)
 	logisticServer.Start()
-
 }

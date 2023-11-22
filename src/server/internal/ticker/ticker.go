@@ -19,15 +19,14 @@ type SummaryService struct{}
 
 type SummaryInt interface {
 	IncreaseTotalUnits()
-	// ResetMessagePerSecond()
-	// IncreaseTotalReached()
-	// GetSummary()
+	ResetMessagePerSecond()
+	IncreaseTotalReached()
+	GetSummary() (*Summary, error)
 	Tick()
 }
 
 func (s *SummaryService) Tick() {
 
-	fmt.Println("tick triggered")
 	ticker := time.NewTicker(1 * time.Second)
 	done := make(chan bool)
 
@@ -58,19 +57,19 @@ func (s *SummaryService) IncreaseTotalUnits() {
 	fmt.Println("Increased", summaryResult.totalUnits)
 }
 
-//  func (s *Summary) IncreaseTotalReached() {
-//  	s.mu.Lock()
-//  	defer s.mu.Unlock()
-//  	s.totalReached++
-// / 	s.messagePerSecond++
-// // }
+func (s *SummaryService) IncreaseTotalReached() {
+	summaryResult.mu.Lock()
+	defer summaryResult.mu.Unlock()
+	summaryResult.totalReached++
+	summaryResult.messagePerSecond++
+}
 
-// func (s *Summary) ResetMessagePerSecond() {
-// 	s.mu.Lock()
-// 	defer s.mu.Unlock()
-// 	s.messagePerSecond = 0
-// }
+func (s *SummaryService) ResetMessagePerSecond() {
+	summaryResult.mu.Lock()
+	defer summaryResult.mu.Unlock()
+	summaryResult.messagePerSecond = 0
+}
 
-// func (s *Summary) GetSummary() (*Summary, error) {
-// 	return s, nil
-// }
+func (s *SummaryService) GetSummary() (*Summary, error) {
+	return &summaryResult, nil
+}
