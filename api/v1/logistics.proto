@@ -25,6 +25,13 @@ service CoopLogisticsEngineAPI {
             body: "*"
         };
     }
+    // Get Summary
+    rpc GetSummary() returns (SummaryResponse) {
+        option (google.api.http) = {
+            post: "/v1/summary"
+            body: "*"
+        };
+    }
 }
 
 // ---------------------------------------
@@ -49,6 +56,12 @@ message UnitReachedWarehouseRequest {
 
 // DefaultResponse
 message DefaultResponse {}
+
+// Summary Response
+message UnitReachedWarehouseRequest {
+    int64 totalUnits = 1;
+    int64 totalReached = 2;
+}
 
 // ---------------------------------------
 // Models
