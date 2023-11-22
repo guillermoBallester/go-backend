@@ -9,23 +9,24 @@ import (
 
 type LogisticCtlr struct {
 	serverApi.UnimplementedCoopLogisticsEngineAPIServer
-	summary ticker.Summary
+	svc ticker.SummaryInt
 }
 
-func NewLogisticController(summary ticker.Summary) *LogisticCtlr {
+func NewLogisticController(svc ticker.SummaryInt) *LogisticCtlr {
+	go svc.Tick()
 	return &LogisticCtlr{
-		summary: summary,
+		svc: svc,
 	}
 }
 
 func (ctlr *LogisticCtlr) MoveUnit(ctx context.Context, req *serverApi.MoveUnitRequest) (*serverApi.DefaultResponse, error) {
-	ctlr.summary.IncreaseTotalUnits()
+	ctlr.svc.IncreaseTotalUnits()
 	resp := &serverApi.DefaultResponse{}
 	return resp, nil
 }
 
 func (ctlr *LogisticCtlr) UnitReachedWarehouse(ctx context.Context, req *serverApi.UnitReachedWarehouseRequest) (*serverApi.DefaultResponse, error) {
-	ctlr.summary.IncreaseTotalReached()
+	ctlr.svc.IncreaseTotalReached()
 	resp := &serverApi.DefaultResponse{}
 	return resp, nil
 }

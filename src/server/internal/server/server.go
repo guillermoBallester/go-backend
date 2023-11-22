@@ -22,7 +22,6 @@ func RunGRPCServer(ctlr *controller.LogisticCtlr) *LogisticServer {
 	opts := []grpc.ServerOption{}
 	server := grpc.NewServer(opts...)
 	serverApi.RegisterCoopLogisticsEngineAPIServer(server, ctlr)
-
 	return &LogisticServer{server: server}
 
 }

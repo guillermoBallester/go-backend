@@ -13,47 +13,75 @@ type Summary struct {
 	mu               sync.Mutex
 }
 
-func (s *Summary) Tick() {
+type SummaryResponse struct {
+	totalUnits   int `json:"totalUnits"`
+	totalReached int `json:"totalReached"`
+}
+
+var summaryResult Summary
+
+type SummaryService struct{}
+
+type SummaryInt interface {
+	IncreaseTotalUnits()
+	ResetMessagePerSecond()
+	IncreaseTotalReached()
+	GetSummary() (SummaryResponse, error)
+	Tick()
+}
+
+func (s *SummaryService) Tick() {
 
 	ticker := time.NewTicker(1 * time.Second)
 	done := make(chan bool)
 
 	go func() {
+	loop:
 		for {
 			select {
 			case <-done:
-				fmt.Println("Total units reached: ", s.totalReached)
-				fmt.Println("Total units processed: ", s.totalUnits)
 				return
 			case t := <-ticker.C:
-				fmt.Println("Messages per second at ", t, "are: ", s.messagePerSecond)
+				fmt.Println("Messages per second at ", t, "are: ", summaryResult.messagePerSecond)
+				if summaryResult.totalUnits != 0 && summaryResult.messagePerSecond == 0 {
+					fmt.Println("Total units reached: ", summaryResult.totalReached)
+					fmt.Println("Total units processed: ", summaryResult.totalUnits)
+					ticker.Stop()
+					done <- true
+					break loop
+				}
+				s.ResetMessagePerSecond()
 			}
-			s.ResetMessagePerSecond()
 		}
-
 	}()
 
-	time.Sleep(10 * time.Second)
-	ticker.Stop()
-	done <- true
 }
 
-func (s *Summary) IncreaseTotalUnits() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.totalUnits++
-	s.messagePerSecond++
+func (s *SummaryService) IncreaseTotalUnits() {
+	summaryResult.mu.Lock()
+	defer summaryResult.mu.Unlock()
+	summaryResult.totalUnits++
+	summaryResult.messagePerSecond++
 }
 
-func (s *Summary) IncreaseTotalReached() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.totalReached++
-	s.messagePerSecond++
+func (s *SummaryService) IncreaseTotalReached() {
+	summaryResult.mu.Lock()
+	defer summaryResult.mu.Unlock()
+	summaryResult.totalReached++
+	summaryResult.messagePerSecond++
 }
 
-func (s *Summary) ResetMessagePerSecond() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.messagePerSecond = 0
+func (s *SummaryService) ResetMessagePerSecond() {
+	summaryResult.mu.Lock()
+	defer summaryResult.mu.Unlock()
+	summaryResult.messagePerSecond = 0
+}
+
+func (s *SummaryService) GetSummary() (SummaryResponse, error) {
+	summaryResult.mu.Lock()
+	defer summaryResult.mu.Unlock()
+	return SummaryResponse{
+		totalUnits:   summaryResult.totalUnits,
+		totalReached: summaryResult.totalReached,
+	}, nil
 }
